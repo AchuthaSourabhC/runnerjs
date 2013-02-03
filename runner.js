@@ -1,32 +1,30 @@
 var childProcess = require('child_process')
-	, async = require('async')
-	, ex1,ex2;
+	, ex1, ex2, exefile = '', compilecmd = ''
+	, runcmd = '';
 
-exports.run = function(){
-    ex1 = childProcess.exec('g++ -o test test.cpp',
-        function (error, stdout, stderr) {
-            if (error) {
-              console.log(error.stack);
-              console.log('Error code: '+error.code);
-              console.log('Signal received: '+error.signal);
-            }
-            console.log('Child Process STDOUT: '+stdout);
-            console.log('Child Process STDERR: '+stderr);
-            ex2 = childProcess.exec('test.exe < input.txt > output.txt',
-                function (error, stdout, stderr) {
-                    if (error) {
-                      console.log(error.stack);
-                      console.log('Error code: '+error.code);
-                      console.log('Signal received: '+error.signal);
-                    }
-                    console.log('Child Process STDOUT: '+stdout);
-                    console.log('Child Process STDERR: '+stderr);
-                    });
-            ex2.on('exit',function(error){
-                console.log('Process exited with error status: '+error);
-            });
-        });
+function Runner(code, input, output){
+	this.code = code;
+	this.input = input;
+	this.output = output;
+}
+
+Runner.prototype.run = function(){
+	exefile = this.code.split('.')[0];
+	compilecmd = 'g++ -o ' + exefile + ' ' + this.code;
+	runcmd = exefile + '.exe' + ' < ' + this.input + ' > ' + this.output;
+	cmd =runcmd + ' , ' + compilecmd;
+	ex1 = childProcess.exec(cmd,
+			function (error, stdout, stderr, runcmd) {
+				if (error) {
+				  console.log(error.stack);
+				  console.log('Error code: '+error.code);
+				  console.log('Signal received: '+error.signal);
+				}
+				console.log('Child Process STDOUT: '+stdout);
+				console.log('Child Process STDERR: '+stderr);
+			});
     ex1.on('exit',function(error){
         console.log('Process exited with error status: '+error);
     });
 }
+module.exports = Runner;
