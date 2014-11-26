@@ -1,5 +1,6 @@
 Runner.js
 -------------------
+Run your programs on a server with ease.
 
 Usage
 --------
